@@ -1,0 +1,115 @@
+/* Reset de base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  background-color: #f4f8fb;
+  color: #1f2937;
+  height: 100%;
+}
+
+a {
+  color: #2563eb;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #1d4ed8;
+}
+
+/* Boutons */
+button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+button:hover {
+  background-color: #2563eb;
+  transform: scale(1.02);
+}
+
+button:disabled {
+  background-color: #93c5fd;
+  cursor: not-allowed;
+}
+
+/* Cartes (composants UI) */
+.card {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  padding: 20px;
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Champs de formulaire */
+input, select, textarea {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  width: 100%;
+  font-size: 1rem;
+  margin-top: 6px;
+  margin-bottom: 14px;
+  transition: border 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+/* Layouts */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Titres */
+h1, h2, h3 {
+  color: #1e3a8a;
+  margin-bottom: 12px;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+/* Barre de navigation */
+.navbar {
+  background-color: white;
+  padding: 12px 24px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar a {
+  font-weight: 500;
+  margin-left: 16px;
+}
