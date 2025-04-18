@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuth, setIsAuth] = useState(false);
 
   //VRAI CODE
-  /*
+ 
   useEffect(() => {
     const savedToken = getToken();
     if (savedToken) {
@@ -16,15 +16,15 @@ export const AuthProvider = ({ children }) => {
       setIsAuth(true);
     }
   }, []);
-  */
-
+  
+/*
   //FAUX CODE POUR TESTS
   useEffect(() => {
     // Simulation provisoire d'un utilisateur connecté
     setToken('fake-token');
     setIsAuth(true);
   }, []);
-  
+  */
 
   const login = (token) => {
     saveToken(token);
