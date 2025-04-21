@@ -4,19 +4,28 @@ def creation_table():
     con = sqlite3.connect("routeur.db")
     cur = con.cursor()
     res = cur.execute("CREATE TABLE IF NOT EXISTS request(json text)")
+    cur.execute("CREATE TABLE IF NOT EXISTS login(email text,password text,priviledge integer)")
+    cur.execute("CREATE TABLE IF NOT EXISTS Client(name text)")
     return
 
-#creation_table()
-def test():
+
+def test(text):
     con = sqlite3.connect("routeur.db")
     cur = con.cursor()
+    #con.execute(text)
+    #con.commit()
     #cur.execute("INSERT INTO admin(username,password,status) VALUES ('aaaa','123','admin')")
-    #cur.execute("ALTER TABLE admin ADD COLUMN status text")
-    
+    cur.execute("INSERT INTO Client(name) VALUES('Felix')")
+    """
+    ans = cur.fetchone()
+    print(ans)
+    print("********************************")
+    print(type(ans))
+    """
     return
 
-#test()
 
+#test("DELETE from login where rowid = 2")
 def printdb():
     con = sqlite3.connect("routeur.db")
     cur = con.cursor()
@@ -38,4 +47,6 @@ def printdb():
     with con:
         con.close()
         """
-printdb()
+#printdb()
+test("")
+#creation_table()

@@ -20,7 +20,7 @@ const AdminPage = () => {
   const loadClients = async () => {
     try {
       const data = await getClients();
-      setClients(data);
+	setClients(data);
     } catch (error) {
       console.error('Erreur chargement clients :', error);
     }
