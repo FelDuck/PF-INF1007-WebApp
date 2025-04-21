@@ -5,7 +5,7 @@ def creation_table():
     cur = con.cursor()
     res = cur.execute("CREATE TABLE IF NOT EXISTS request(json text)")
     cur.execute("CREATE TABLE IF NOT EXISTS login(email text,password text,priviledge integer)")
-    cur.execute("CREATE TABLE IF NOT EXISTS Client(name text)")
+    cur.execute("ALTER TABLE Client ADD COLUMN (email text)")
     return
 
 
@@ -47,5 +47,6 @@ def printdb():
         con.close()
         """
 #printdb()
-test("INSERT INTO Client(name) VALUES('Felix')")
 #creation_table()
+#test("UPDATE Client SET email='asd@asd.com' WHERE name = 'Felix'")
+#test("INSERT INTO login(email,password,priviledge) VALUES('asd@asd.com','123',0)")

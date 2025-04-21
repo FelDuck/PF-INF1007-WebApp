@@ -20,6 +20,15 @@ app.add_middleware(
 )
 
 authe = Authentification()
+@app.delete('/clients/{c_id}')
+async def deleteClient(c_id):
+    con = sqlite3.connect("routeur.db")
+    query = "DELETE FROM Client WHERE rowid = "+str(c_id)
+    with con:
+        con.execute(query)
+        fcon.commit()
+    return
+
 @app.post('/clients/get')
 async def getClient(request: Request):
     jsonData = request.headers
@@ -70,7 +79,13 @@ async def loginCheck(request: Request):
  
     verif,priv = authe.verification_connexion_init(email,password)
     if verif:
-        return {"token":authe.attributionCle(email)}
+        if priv:
+            return {"token":authe.attributionCle(email)}
+        else:
+            con = sqlite3.connect("routeur.db")
+            cur = con.cursor()
+            c_id = cur.execute("SELECT rowid FROM Client WHERE email ='"+email+"'").fetchone()
+            return {"token":authe.attributionCle(email),"id":c_id[0]}
     else:
         return
  
@@ -86,9 +101,9 @@ async def loginCheck2(data : credentials):
 
 def send_text(text):
     con = sqlite3.connect("routeur.db")
-
-    con.execute("INSERT INTO request(json) values('"+text+"')")
-    con.commit()
+    with con:
+        con.execute("INSERT INTO request(json) values('"+text+"')")
+        con.commit()
 
 
        

@@ -24,8 +24,17 @@ const LoginPage = () => {
     setError('');
     try {
       const response = await login(form);
-      setAuthToken(response.token);
-      router.push('/admin');
+	setAuthToken(response.token);
+	jsonData = await response.json();
+	if (jsonData.id === undefined){
+	    router.push('/admin');
+	}else{
+	    router.push('/client['+response.id+']')
+	}
+	
+
+	
+	
     } catch (err) {
       setError('Email ou mot de passe invalide');
     }
