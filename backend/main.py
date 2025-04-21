@@ -20,24 +20,41 @@ app.add_middleware(
 )
 
 authe = Authentification()
-@app.get('/clients')
-async def addClient(request: Request):
+@app.post('/clients/get')
+async def getClient(request: Request):
     jsonData = request.headers
     token = jsonData["Authorization"]
-    authe.verification_connexion(token)
+    #authe.verification_connexion(token)
     con = sqlite3.connect("routeur.db")
     cur = con.cursor()
-    c_id = c_name = "["
+    """
+    query = '{clients:['
     for row in cur.execute("SELECT rowid,name FROM Client"):
-        c_id = c_id + row[0]
-        c_name = c_name +'"'+ row[1] + '"'
+        query = query + '{"id":'+str(row[0])+',"name":"'+row[1]+'"},'
 
-    c_id = c_id + "]"
-    c_name = c_name + "]"
+    query = query[:-1]
+    query = query + ']}'
+    send_text(query)
+    return query
+    """
+    query = []
+    for row in cur.execute("SELECT rowid,name FROM Client"):
+        query.append({"id":+row[0],"name":row[1]})
 
-    return '{"id":'+ c_id+',"name":'+c_name+'}'
-        
-    
+    return query
+@app.post('/clients')
+async def addClient(request: Request):
+    """
+
+    send_text(json.dumps(jsonData))
+    """
+    jsonData = await request.json()
+    con = sqlite3.connect("routeur.db")
+    query = 'INSERT INTO Client(name) VALUES("'+jsonData["name"]+'")'
+    with con:
+        con.execute(query)
+        con.commit()
+    return
 
 @app.post('/auth/login')
 async def loginCheck(request: Request):

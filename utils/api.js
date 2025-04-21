@@ -50,7 +50,7 @@ export function register(data) {
 // 👤 Clients
 //
 export function getClients() {
-  return apiFetch('/clients');
+    return apiFetch('/clients/get', {method: 'POST'});
 }
 
 export function createClient(clientData) {

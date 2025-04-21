@@ -11,11 +11,10 @@ def creation_table():
 
 def test(text):
     con = sqlite3.connect("routeur.db")
-    cur = con.cursor()
-    #con.execute(text)
-    #con.commit()
+    #cur = con.cursor()
+    con.execute(text)
+    con.commit()
     #cur.execute("INSERT INTO admin(username,password,status) VALUES ('aaaa','123','admin')")
-    cur.execute("INSERT INTO Client(name) VALUES('Felix')")
     """
     ans = cur.fetchone()
     print(ans)
@@ -48,5 +47,5 @@ def printdb():
         con.close()
         """
 #printdb()
-test("")
+test("INSERT INTO Client(name) VALUES('Felix')")
 #creation_table()
