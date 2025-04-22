@@ -12,7 +12,7 @@ const LoginPage = () => {
 
   if (isAuth) {
     router.push('/admin');
-    return null; // Évite que le formulaire se re-render après redirection
+    return null;
   }
 
   const handleChange = (e) => {
@@ -23,17 +23,15 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     try {
-      const response = await login(form);
-      const jsonData = await response.json();
+      const jsonData = await login(form);
+      console.log("Réponse login API:", jsonData);
 
       if (!jsonData.token) {
         throw new Error('Token manquant dans la réponse');
       }
 
-      // Enregistre le token dans le contexte + localStorage
       setAuthToken(jsonData.token);
 
-      // Redirige vers admin ou vers la page client selon le rôle
       if (jsonData.id === undefined) {
         router.push('/admin');
       } else {

@@ -1,14 +1,11 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-/**
- * Fonction générique pour appeler l’API
- */
 async function apiFetch(path, options = {}) {
   const token = localStorage.getItem('token');
 
   const headers = {
     'Content-Type': 'application/json',
-    ...(token && { Authorization: `${token}` }),
+    ...(token && { Authorization: `Bearer ${token}` }), // Correction ici
     ...options.headers,
   };
 
@@ -29,9 +26,7 @@ async function apiFetch(path, options = {}) {
   return data;
 }
 
-//
-// 🔐 Authentification
-//
+// Authentification
 export function login(credentials) {
   return apiFetch('/auth/login', {
     method: 'POST',
@@ -46,11 +41,9 @@ export function register(data) {
   });
 }
 
-//
-// 👤 Clients
-//
+// Clients
 export function getClients() {
-    return apiFetch('/clients/get', {method: 'POST'});
+  return apiFetch('/clients/get', { method: 'POST' });
 }
 
 export function createClient(clientData) {
@@ -66,9 +59,7 @@ export function deleteClient(id) {
   });
 }
 
-//
-// 📺 Décodeurs
-//
+// Décodeurs
 export function getDecodersForClient(clientId) {
   return apiFetch(`/clients/${clientId}/decoders`);
 }
@@ -96,9 +87,7 @@ export function getDecoderStatus(decoderId) {
   return apiFetch(`/decoders/${decoderId}/status`);
 }
 
-//
-// 📡 Chaînes
-//
+// Chaînes
 export function addChannel(decoderId, channelData) {
   return apiFetch(`/decoders/${decoderId}/channels`, {
     method: 'POST',
