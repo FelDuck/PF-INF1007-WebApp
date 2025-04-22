@@ -1,22 +1,62 @@
-import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { register } from '@/utils/api';
 
 export default function Signup() {
+  const router = useRouter();
+  const [form, setForm] = useState({ username: '', password: '' });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    try {
+      await register(form);
+      setSuccess(true);
+      setTimeout(() => router.push('/login'), 1500);
+    } catch (err) {
+      console.error(err);
+      setError('Erreur lors de la création du compte.');
+    }
+  };
+
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Créer un compte</h1>
-      <form style={styles.form}>
+      <form style={styles.form} onSubmit={handleSubmit}>
         <div style={styles.inputGroup}>
           <label style={styles.label}>Nom d'utilisateur</label>
-          <input type="text" name="username" style={styles.input} />
+          <input
+            type="text"
+            name="username"
+            value={form.username}
+            onChange={handleChange}
+            style={styles.input}
+            required
+          />
         </div>
         <div style={styles.inputGroup}>
           <label style={styles.label}>Mot de passe</label>
-          <input type="password" name="password" style={styles.input} />
+          <input
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            style={styles.input}
+            required
+          />
         </div>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {success && <p style={{ color: 'green' }}>Compte créé avec succès. Redirection...</p>}
         <button type="submit" style={styles.button}>Créer le compte</button>
       </form>
       <p style={styles.link}>
-        Vous avez déjà un compte ? <Link href="/login">Connectez-vous</Link>
+        Vous avez déjà un compte ? <a href="/login">Connectez-vous</a>
       </p>
     </div>
   );
