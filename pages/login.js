@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { login } from '@/utils/api';
 import { useAuth } from '../context/Authcontext';
 
-
 const LoginPage = () => {
   const { login: setAuthToken, isAuth } = useAuth();
   const router = useRouter();
@@ -13,6 +12,7 @@ const LoginPage = () => {
 
   if (isAuth) {
     router.push('/admin');
+    return null; // Évite que le formulaire se re-render après redirection
   }
 
   const handleChange = (e) => {
@@ -24,18 +24,24 @@ const LoginPage = () => {
     setError('');
     try {
       const response = await login(form);
-	setAuthToken(response.token);
-	jsonData = await response.json();
-	if (jsonData.id === undefined){
-	    router.push('/admin');
-	}else{
-	    router.push('/client['+response.id+']')
-	}
-	
+      const jsonData = await response.json();
 
-	
-	
+      if (!jsonData.token) {
+        throw new Error('Token manquant dans la réponse');
+      }
+
+      // Enregistre le token dans le contexte + localStorage
+      setAuthToken(jsonData.token);
+
+      // Redirige vers admin ou vers la page client selon le rôle
+      if (jsonData.id === undefined) {
+        router.push('/admin');
+      } else {
+        router.push(`/client/${jsonData.id}`);
+      }
+
     } catch (err) {
+      console.error(err);
       setError('Email ou mot de passe invalide');
     }
   };
