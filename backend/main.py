@@ -3,6 +3,10 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 from auth import Authentification
+import httpx
+from db import send_text
+import json
+
 
 app = FastAPI()
 
@@ -77,14 +81,49 @@ async def deleteClient(c_id: int):
 
 @app.get("/clients/{client_id}/decoders")
 async def get_decoders(client_id: int):
+    apiurl = "https://wflageol-uqtr.net/decoder"
+    query = f'SELECT Decodeur_id FROM decodeur WHERE Client_id = {client_id}'
+    return_dicts = []
+    id_list = []
+    
+    con = sqlite3.connect("routeur.db")
+    cur = con.cursor()
+    rows = cur.execute(query).fetchall()
+    con.close()
+    for row in rows:
+        id_list.append(row[0])
+        
+    con.close()
+    
+    async with httpx.AsyncClient() as client:
+
+        for d_id in id_list:
+            sd_id = str(d_id)
+            #qdata = f'"id":"THEF04039901","address":"127.0.10.{sd_id},"action":"info"'
+            #qdata = '{'+qdata+'}'
+            qdata = json.dumps({"id":"THEF04039901","address":f"127.0.10.{sd_id}","action":"info"})
+            response = await client.post(apiurl,data =qdata)
+
+            
+            datajson = response.json()
+            if datajson["response"] != "OK":
+                raise HTTPException(status_code=401, detail=f"Something is messed up, id:{sd_id}, data={qdata},datajson= {json.dumps(datajson)}")
+            return_dicts.append({"id":d_id,"status":datajson["state"]})
+            
+                
+
+
+        return return_dicts
+    
+    """
     con = sqlite3.connect("routeur.db")
     cur = con.cursor()
     rows = cur.execute(
-        "SELECT rowid, nom, status FROM Decodeur WHERE client_id = ?",
+        "SELECT Decodeur_id FROM Decodeur WHERE Client_id = ?",
         (client_id,)
     ).fetchall()
     con.close()
-
+ 
     return [
         {
             "id": row[0],
@@ -92,3 +131,5 @@ async def get_decoders(client_id: int):
             "status": row[2]
         } for row in rows
     ]
+"""
+

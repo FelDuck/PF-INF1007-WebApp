@@ -32,10 +32,10 @@ const LoginPage = () => {
 
       setAuthToken(jsonData.token);
 
-      if (jsonData.id === undefined) {
+	if (jsonData.json().id === undefined ) {
         router.push('/admin');
       } else {
-        router.push(`/client/${jsonData.id}`);
+          router.push(`/client/${jsonData.json().id}`);
       }
 
     } catch (err) {
