@@ -1,143 +1,94 @@
-from fastapi import FastAPI, Request
-import json
-from pydantic import BaseModel
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-import jwt
 import sqlite3
-import datetime as dt
 from auth import Authentification
-
-
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
-    allow_credentials= True,
-    allow_methods=['*'],
-    allow_headers=['*']
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 authe = Authentification()
-@app.delete('/clients/{c_id}')
-async def deleteClient(c_id):
-    con = sqlite3.connect("routeur.db")
-    query = "DELETE FROM Client WHERE rowid = "+str(c_id)
-    with con:
-        con.execute(query)
-        fcon.commit()
-    return
-
-@app.post('/clients/get')
-async def getClient(request: Request):
-    jsonData = request.headers
-    token = jsonData["Authorization"]
-    #authe.verification_connexion(token)
-    con = sqlite3.connect("routeur.db")
-    cur = con.cursor()
-    """
-    query = '{clients:['
-    for row in cur.execute("SELECT rowid,name FROM Client"):
-        query = query + '{"id":'+str(row[0])+',"name":"'+row[1]+'"},'
-
-    query = query[:-1]
-    query = query + ']}'
-    send_text(query)
-    return query
-    """
-    query = []
-    for row in cur.execute("SELECT rowid,name FROM Client"):
-        query.append({"id":+row[0],"name":row[1]})
-
-    return query
-@app.post('/clients')
-async def addClient(request: Request):
-    """
-
-    send_text(json.dumps(jsonData))
-    """
-    jsonData = await request.json()
-    con = sqlite3.connect("routeur.db")
-    query = 'INSERT INTO Client(name) VALUES("'+jsonData["name"]+'")'
-    with con:
-        con.execute(query)
-        con.commit()
-    return
 
 @app.post('/auth/login')
 async def loginCheck(request: Request):
-    """
-    jsonData = json.dumps(await request.json())    
-    send_text(jsonData["email"]) 
-    """
     jsonData = await request.json()
-    email = jsonData["email"]
-    password = jsonData["password"]
- 
- 
- 
-    verif,priv = authe.verification_connexion_init(email,password)
-    if verif:
-        if priv:
-            return {"token":authe.attributionCle(email)}
-        else:
-            con = sqlite3.connect("routeur.db")
-            cur = con.cursor()
-            c_id = cur.execute("SELECT rowid FROM Client WHERE email ='"+email+"'").fetchone()
-            return {"token":authe.attributionCle(email),"id":c_id[0]}
-    else:
-        return
- 
-"""
-@app.post('/auth/login HTTP/1.1')
-async def loginCheck2(data : credentials):
-    #a = json.load(Item)
-    #print(a)
-    console.log(data)
-    return jwt.encode("aaa","secretkey",algorithm="HS256")
-"""
+    email = jsonData.get("email")
+    password = jsonData.get("password")
 
+    verif, priv = authe.verification_connexion_init(email, password)
+    if not verif:
+        raise HTTPException(status_code=401, detail="Identifiants invalides")
 
-def send_text(text):
+    token = authe.attributionCle(email)
+
+    if priv:
+        return {"token": token, "id": None}
+
     con = sqlite3.connect("routeur.db")
+    cur = con.cursor()
+    c_id = cur.execute("SELECT rowid FROM Client WHERE email = ?", (email,)).fetchone()
+    con.close()
+
+    if c_id is None:
+        raise HTTPException(status_code=404, detail="Client introuvable")
+
+    return {"token": token, "id": c_id[0]}
+
+@app.post('/clients/get')
+async def getClient(request: Request):
+    token = request.headers.get("Authorization")
+    if not token or not authe.verification_connexion(token):
+        raise HTTPException(status_code=401, detail="Accès non autorisé")
+
+    con = sqlite3.connect("routeur.db")
+    cur = con.cursor()
+
+    query = []
+    for row in cur.execute("SELECT rowid, name FROM Client"):
+        query.append({"id": row[0], "name": row[1]})
+
+    return query
+
+@app.post('/clients')
+async def addClient(request: Request):
+    jsonData = await request.json()
+    con = sqlite3.connect("routeur.db")
+    query = 'INSERT INTO Client(name) VALUES(?)'
     with con:
-        con.execute("INSERT INTO request(json) values('"+text+"')")
+        con.execute(query, (jsonData["name"],))
         con.commit()
+    return {"message": "Client ajouté avec succès"}
 
+@app.delete('/clients/{c_id}')
+async def deleteClient(c_id: int):
+    con = sqlite3.connect("routeur.db")
+    query = "DELETE FROM Client WHERE rowid = ?"
+    with con:
+        con.execute(query, (c_id,))
+        con.commit()
+    return {"message": "Client supprimé"}
 
-       
-class administrateur:
-    
-    def __init__():
-        null
-    def creation_client(email,password,priviledge):
-        null
-        
-    def creation_decodeur():
-        null
-    def modif_client():
-        null
-    def modif_decodeur():
-        null
+@app.get("/clients/{client_id}/decoders")
+async def get_decoders(client_id: int):
+    con = sqlite3.connect("routeur.db")
+    cur = con.cursor()
+    rows = cur.execute(
+        "SELECT rowid, nom, status FROM Decodeur WHERE client_id = ?",
+        (client_id,)
+    ).fetchall()
+    con.close()
 
-class ControlleurClient():
-
-    def __init__():
-        null
-    def verification_cle():
-        null
-    def accesseur_client():
-        null
-    def mutateur_client():
-        null
-
-class clients():
-
-    def __init__():
-        null
-    def receveur_notif():
-        null
-    def accesseur_liste_decodeur():
-        null
-    
+    return [
+        {
+            "id": row[0],
+            "nom": row[1],
+            "status": row[2]
+        } for row in rows
+    ]
