@@ -1,30 +1,21 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { getToken, saveToken, removeToken, isAuthenticated } from '@/utils/auth';
+import { getToken, saveToken, removeToken } from '@/utils/auth';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isAuth, setIsAuth] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // <- nouveau
 
-  //VRAI CODE
- 
   useEffect(() => {
     const savedToken = getToken();
     if (savedToken) {
       setToken(savedToken);
       setIsAuth(true);
     }
+    setIsLoading(false); // <- indique que le chargement est terminé
   }, []);
-  
-/*
-  //FAUX CODE POUR TESTS
-  useEffect(() => {
-    // Simulation provisoire d'un utilisateur connecté
-    setToken('fake-token');
-    setIsAuth(true);
-  }, []);
-  */
 
   const login = (token) => {
     saveToken(token);
@@ -39,13 +30,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, isAuth, login, logout }}>
+    <AuthContext.Provider value={{ token, isAuth, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Hook personnalisé pour utiliser le contexte
 export const useAuth = () => {
   return useContext(AuthContext);
 };
