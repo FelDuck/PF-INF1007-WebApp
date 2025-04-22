@@ -5,7 +5,7 @@ async function apiFetch(path, options = {}) {
 
   const headers = {
     'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }), // Correction ici
+    ...(token && { Authorization: token }),
     ...options.headers,
   };
 
