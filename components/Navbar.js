@@ -1,19 +1,21 @@
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 
 const Navbar = ({ isAuthenticated, onLogout }) => {
   const [showWarning, setShowWarning] = useState(false);
+  const router = useRouter(); // ✅ Ajouté ici
 
   const handleLogoClick = (e) => {
     if (isAuthenticated) {
-      e.preventDefault(); // empêcher la redirection
+      e.preventDefault();
       setShowWarning(true);
     }
   };
 
   const handleLogout = () => {
-    onLogout();             
-    router.push('/login');  
+    onLogout();
+    router.push('/login'); // ✅ Corrigé : fonctionne maintenant
   };
 
   return (
@@ -29,11 +31,9 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
 
         <div className="nav-links">
           {isAuthenticated ? (
-            <>
-              <button onClick={onLogout} style={{ marginLeft: '16px' }}>
-                Déconnexion
-              </button>
-            </>
+            <button onClick={handleLogout} style={{ marginLeft: '16px' }}>
+              Déconnexion
+            </button>
           ) : (
             <>
               <Link href="/login">Connexion</Link>
@@ -47,7 +47,7 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
         <div style={styles.overlay}>
           <div style={styles.modal}>
             <p style={{ marginBottom: '1rem' }}>
-              ⚠️ Vous devez vous déconnecter afin de retourner au menu de connexion.<br />
+              Vous devez vous déconnecter afin de retourner au menu de connexion.<br />
               Appuyez sur "Déconnexion".
             </p>
             <button onClick={() => setShowWarning(false)} style={styles.button}>OK</button>
