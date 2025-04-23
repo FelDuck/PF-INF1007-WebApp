@@ -83,6 +83,18 @@ export function restartDecoder(decoderId) {
   });
 }
 
+export function reinitDecoder(decoderId) {
+  return apiFetch(`/decoders/${decoderId}/reinit`, {
+    method: 'POST',
+  });
+}
+
+export function shutdownDecoder(decoderId) {
+  return apiFetch(`/decoders/${decoderId}/shutdown`, {
+    method: 'POST',
+  });
+}
+
 export function getDecoderStatus(decoderId) {
   return apiFetch(`/decoders/${decoderId}/status`);
 }
