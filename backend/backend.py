@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 from auth import Authentification
 import httpx
-from db import send_text
 import json
 
 
