@@ -132,6 +132,7 @@ async def restart_decodeur(decoder_id:int):
         if datajson["response"] != "OK":
                 raise HTTPException(status_code=401, detail=f"Something is messed up data={qdata},datajson= {json.dumps(datajson)}")
         return datajson
+
 @app.post("/decoders/{decoder_id}/shutdown")
 async def shutdown_decodeur(decoder_id:int):
     apiurl = "https://wflageol-uqtr.net/decoder"
@@ -142,23 +143,16 @@ async def shutdown_decodeur(decoder_id:int):
         if datajson["response"] != "OK":
                 raise HTTPException(status_code=401, detail=f"Something is messed up data={qdata},datajson= {json.dumps(datajson)}")
         return datajson
- 
 
-    """
-    con = sqlite3.connect("routeur.db")
-    cur = con.cursor()
-    rows = cur.execute(
-        "SELECT Decodeur_id FROM Decodeur WHERE Client_id = ?",
-        (client_id,)
-    ).fetchall()
-    con.close()
+@app.post("/decoders/{decoder_id}/reinit")
+async def reinit_decodeur(decoder_id:int):
+    apiurl = "https://wflageol-uqtr.net/decoder"
+    qdata = json.dumps({"id":"THEF04039901","address":f"127.0.10.{decoder_id}","action":"reinit"})
+    async with httpx.AsyncClient() as client:
+        response = await client.post(apiurl,data =qdata,timeout = None)
+        datajson = response.json()
+        if datajson["response"] != "OK":
+                raise HTTPException(status_code=401, detail=f"Something is messed up data={qdata},datajson= {json.dumps(datajson)}")
+        return datajson
  
-    return [
-        {
-            "id": row[0],
-            "nom": row[1],
-            "status": row[2]
-        } for row in rows
-    ]
-"""
 
