@@ -20,6 +20,13 @@ def init_db():
         )
     """)
 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS Decodeur (
+            Client_id integer,
+            Decodeur_id integer
+    )
+    """)
+
     # Données de test
     cur.execute("INSERT OR IGNORE INTO login(email, password, priviledge) VALUES (?, ?, ?)", 
                 ("admin@admin.com", "admin", 1))  # admin
@@ -28,18 +35,9 @@ def init_db():
     cur.execute("INSERT OR IGNORE INTO Client(name, email) VALUES (?, ?)", 
                 ("Client 1", "user@client.com"))
 
-        # Table pour les décodeurs
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS Decodeur (
-            nom TEXT,
-            status TEXT,
-            client_id INTEGER
-        )
-    """)
-
-    # Données de test
-    cur.execute("INSERT INTO Decodeur(nom, status, client_id) VALUES (?, ?, ?)", ("Décodeur 1", "actif", 1))
-    cur.execute("INSERT INTO Decodeur(nom, status, client_id) VALUES (?, ?, ?)", ("Décodeur 2", "inactif", 1))
+   
+    cur.execute("INSERT INTO Decodeur(Client_id,Decodeur_id) VALUES (1, 1)")
+    cur.execute("INSERT INTO Decodeur(Client_id,Decodeur_id) VALUES (1, 2)")
 
 
     con.commit()

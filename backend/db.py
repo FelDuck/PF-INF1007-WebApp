@@ -1,5 +1,5 @@
 import sqlite3
-
+from backend import shutdown_decodeur
 def creation_table():
     con = sqlite3.connect("routeur.db")
     cur = con.cursor()
@@ -59,3 +59,4 @@ def printdb():
 #test("INSERT INTO decodeur(Client_id,Decodeur_id)VALUES(1,1)")
 #test("INSERT INTO decodeur(Client_id,Decodeur_id)VALUES(1,2)")
 #test("DELETE FROM decodeur WHERE rowid = 54")
+shutdown_decodeur(1)

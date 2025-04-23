@@ -114,7 +114,36 @@ async def get_decoders(client_id: int):
 
 
         return return_dicts
-    
+@app.delete("/clients/{client_id}/decoders/{decoder_id}")
+async def deletedecodeur(client_id: int,decoder_id: int):
+    query = f"DELETE FROM Decodeur WHERE Client_id = {client_id} AND Decodeur_id = {decoder_id}"
+    con = sqlite3.connect("routeur.db")
+    con.execute(query)
+    con.commit()
+    return {"message": "Decodeur supprimé"}
+
+@app.post("/decoders/{decoder_id}/restart")
+async def restart_decodeur(decoder_id:int):
+    apiurl = "https://wflageol-uqtr.net/decoder"
+    qdata = json.dumps({"id":"THEF04039901","address":f"127.0.10.{decoder_id}","action":"reset"})
+    async with httpx.AsyncClient() as client:
+        response = await client.post(apiurl,data =qdata,timeout = None)
+        datajson = response.json()
+        if datajson["response"] != "OK":
+                raise HTTPException(status_code=401, detail=f"Something is messed up data={qdata},datajson= {json.dumps(datajson)}")
+        return datajson
+@app.post("/decoders/{decoder_id}/shutdown")
+async def shutdown_decodeur(decoder_id:int):
+    apiurl = "https://wflageol-uqtr.net/decoder"
+    qdata = json.dumps({"id":"THEF04039901","address":f"127.0.10.{decoder_id}","action":"shutdown"})
+    async with httpx.AsyncClient() as client:
+        response = await client.post(apiurl,data =qdata,timeout = None)
+        datajson = response.json()
+        if datajson["response"] != "OK":
+                raise HTTPException(status_code=401, detail=f"Something is messed up data={qdata},datajson= {json.dumps(datajson)}")
+        return datajson
+ 
+
     """
     con = sqlite3.connect("routeur.db")
     cur = con.cursor()
