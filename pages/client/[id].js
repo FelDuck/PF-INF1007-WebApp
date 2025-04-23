@@ -5,12 +5,13 @@ import {
   removeDecoderFromClient,
   restartDecoder,
   getDecoderStatus,
+  reinitDecoder,
+  shutdownDecoder
 } from '@/utils/api';
 import { useAuth } from '@/context/Authcontext';
 
 const ClientPage = () => {
   const { isAuth, isLoading } = useAuth();
-
   const router = useRouter();
   const { id } = router.query;
 
@@ -51,11 +52,64 @@ const ClientPage = () => {
 
   if (isLoading) return <p>Chargement de l’authentification...</p>;
   if (!isAuth) return <p>Accès refusé</p>;
-  
 
   return (
     <div className="container">
       <h1>Décodeurs du client #{id}</h1>
+
+      {/* Boutons globaux */}
+      <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <button
+          onClick={async () => {
+            for (const decoder of decoders) {
+              await reinitDecoder(decoder.id);
+            }
+            alert('Tous les décodeurs ont été réinitialisés.');
+          }}
+          style={{ backgroundColor: '#facc15', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold' }}
+        >
+          Réinitialiser tous
+        </button>
+
+        <button
+          onClick={async () => {
+            for (const decoder of decoders) {
+              await restartDecoder(decoder.id);
+            }
+            alert('Tous les décodeurs ont été redémarrés.');
+          }}
+          style={{ backgroundColor: '#3b82f6', color: 'white', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold' }}
+        >
+          Redémarrer tous
+        </button>
+
+        <button
+          onClick={async () => {
+            for (const decoder of decoders) {
+              await shutdownDecoder(decoder.id);
+            }
+            alert('Tous les décodeurs ont été éteints.');
+          }}
+          style={{ backgroundColor: '#9ca3af', color: 'white', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold' }}
+        >
+          Éteindre tous
+        </button>
+
+        <button
+          onClick={async () => {
+            for (const decoder of decoders) {
+              await removeDecoderFromClient(id, decoder.id);
+            }
+            loadDecoders();
+            alert('Tous les décodeurs ont été supprimés.');
+          }}
+          style={{ backgroundColor: '#dc2626', color: 'white', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold' }}
+        >
+          Supprimer tous
+        </button>
+      </div>
+
+      {/* Liste des décodeurs */}
       <div className="card">
         {decoders.length === 0 ? (
           <p>Aucun décodeur trouvé.</p>
